@@ -6,6 +6,7 @@ import { SearchCommand } from './SearchCommand';
 import { AlbumBuilderFAB } from './AlbumBuilderFAB';
 import { AccountModal } from './AccountModal';
 import { useMusicStore } from '../store/musicStore';
+import { SidebarProvider } from '@/components/ui/sidebar';
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -74,17 +75,19 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
   }, [togglePlayPause, nextTrack, prevTrack, addToWishlist, currentTrack, toggleAlbumBuilder, toggleSearch]);
 
   return (
-    <div className="min-h-screen bg-black text-white">
-      <div className="flex h-screen">
-        <Sidebar />
-        <main className="flex-1 overflow-y-auto pb-24">
-          {children}
-        </main>
+    <SidebarProvider>
+      <div className="min-h-screen bg-black text-white w-full">
+        <div className="flex h-screen w-full">
+          <Sidebar />
+          <main className="flex-1 overflow-y-auto pb-24 w-full">
+            {children}
+          </main>
+        </div>
+        <MiniPlayer />
+        <SearchCommand />
+        <AlbumBuilderFAB />
+        <AccountModal />
       </div>
-      <MiniPlayer />
-      <SearchCommand />
-      <AlbumBuilderFAB />
-      <AccountModal />
-    </div>
+    </SidebarProvider>
   );
 };
