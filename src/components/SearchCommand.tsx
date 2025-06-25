@@ -5,7 +5,7 @@ import { useMusicStore } from '../store/musicStore';
 
 export const SearchCommand: React.FC = () => {
   const {
-    isSearchOpen,
+    isSearchExpanded,
     toggleSearch,
     tracks,
     albums,
@@ -26,7 +26,7 @@ export const SearchCommand: React.FC = () => {
   }, [toggleSearch]);
 
   return (
-    <CommandDialog open={isSearchOpen} onOpenChange={toggleSearch}>
+    <CommandDialog open={isSearchExpanded} onOpenChange={toggleSearch}>
       <CommandInput placeholder="Search for songs, albums, artists..." />
       <CommandList>
         <CommandEmpty>No results found.</CommandEmpty>
