@@ -1,173 +1,101 @@
-
 import { create } from 'zustand';
-import { persist } from 'zustand/middleware';
-
-export interface Track {
-  id: string;
-  title: string;
-  artist: string;
-  album: string;
-  duration: number;
-  coverArt: string;
-  audioUrl?: string;
-}
-
-export interface Album {
-  id: string;
-  title: string;
-  artist: string;
-  coverArt: string;
-  year: number;
-  tracks: Track[];
-  isCustom?: boolean;
-}
-
-export interface Playlist {
-  id: string;
-  name: string;
-  coverArt: string;
-  tracks: Track[];
-  isCustom?: boolean;
-}
+import { Track, Album, Playlist } from '../types';
 
 interface MusicState {
-  // Theme
-  isDarkMode: boolean;
-  toggleDarkMode: () => void;
-
-  // Music Data
   tracks: Track[];
   albums: Album[];
   playlists: Playlist[];
-  wishlist: Track[];
-
-  // Player State
   currentTrack: Track | null;
   isPlaying: boolean;
   currentTime: number;
   duration: number;
-  queue: Track[];
-  currentQueueIndex: number;
-
-  // UI State
-  isSearchOpen: boolean;
-  isAlbumBuilderOpen: boolean;
+  volume: number;
+  isMuted: boolean;
+  wishlist: Track[];
   isMiniPlayerExpanded: boolean;
+  isAlbumBuilderOpen: boolean;
 
-  // Actions
   setTracks: (tracks: Track[]) => void;
   setAlbums: (albums: Album[]) => void;
   setPlaylists: (playlists: Playlist[]) => void;
-  addToWishlist: (track: Track) => void;
-  removeFromWishlist: (trackId: string) => void;
   playTrack: (track: Track) => void;
   togglePlayPause: () => void;
   nextTrack: () => void;
   prevTrack: () => void;
   setCurrentTime: (time: number) => void;
-  setDuration: (duration: number) => void;
-  toggleSearch: () => void;
-  toggleAlbumBuilder: () => void;
+  setVolume: (volume: number) => void;
+  toggleMute: () => void;
+  addToWishlist: (track: Track) => void;
+  removeFromWishlist: (trackId: string) => void;
   toggleMiniPlayer: () => void;
-  createAlbum: (title: string, coverArt: string, selectedTracks: Track[]) => void;
+  toggleAlbumBuilder: () => void;
+
+  // Account modal
+  isAccountModalOpen: boolean;
+  toggleAccountModal: () => void;
+  
+  // Search state
+  isSearchExpanded: boolean;
+  toggleSearch: () => void;
 }
 
-export const useMusicStore = create<MusicState>()(
-  persist(
-    (set, get) => ({
-      // Theme
-      isDarkMode: true,
-      toggleDarkMode: () => set((state) => ({ isDarkMode: !state.isDarkMode })),
+export const useMusicStore = create<MusicState>((set, get) => ({
+  tracks: [],
+  albums: [],
+  playlists: [],
+  currentTrack: null,
+  isPlaying: false,
+  currentTime: 0,
+  duration: 0,
+  volume: 1,
+  isMuted: false,
+  wishlist: [],
+  isMiniPlayerExpanded: false,
+  isAlbumBuilderOpen: false,
 
-      // Music Data
-      tracks: [],
-      albums: [],
-      playlists: [],
-      wishlist: [],
-
-      // Player State
-      currentTrack: null,
-      isPlaying: false,
-      currentTime: 0,
-      duration: 0,
-      queue: [],
-      currentQueueIndex: 0,
-
-      // UI State
-      isSearchOpen: false,
-      isAlbumBuilderOpen: false,
-      isMiniPlayerExpanded: false,
-
-      // Actions
-      setTracks: (tracks) => set({ tracks }),
-      setAlbums: (albums) => set({ albums }),
-      setPlaylists: (playlists) => set({ playlists }),
-      
-      addToWishlist: (track) => set((state) => {
-        if (!state.wishlist.find(t => t.id === track.id)) {
-          return { wishlist: [...state.wishlist, track] };
-        }
-        return state;
-      }),
-      
-      removeFromWishlist: (trackId) => set((state) => ({
-        wishlist: state.wishlist.filter(t => t.id !== trackId)
-      })),
-
-      playTrack: (track) => set({
-        currentTrack: track,
-        isPlaying: true,
-        queue: [track],
-        currentQueueIndex: 0
-      }),
-
-      togglePlayPause: () => set((state) => ({ isPlaying: !state.isPlaying })),
-
-      nextTrack: () => set((state) => {
-        const nextIndex = state.currentQueueIndex + 1;
-        if (nextIndex < state.queue.length) {
-          return {
-            currentQueueIndex: nextIndex,
-            currentTrack: state.queue[nextIndex],
-            isPlaying: true
-          };
-        }
-        return state;
-      }),
-
-      prevTrack: () => set((state) => {
-        const prevIndex = state.currentQueueIndex - 1;
-        if (prevIndex >= 0) {
-          return {
-            currentQueueIndex: prevIndex,
-            currentTrack: state.queue[prevIndex],
-            isPlaying: true
-          };
-        }
-        return state;
-      }),
-
-      setCurrentTime: (time) => set({ currentTime: time }),
-      setDuration: (duration) => set({ duration }),
-      toggleSearch: () => set((state) => ({ isSearchOpen: !state.isSearchOpen })),
-      toggleAlbumBuilder: () => set((state) => ({ isAlbumBuilderOpen: !state.isAlbumBuilderOpen })),
-      toggleMiniPlayer: () => set((state) => ({ isMiniPlayerExpanded: !state.isMiniPlayerExpanded })),
-
-      createAlbum: (title, coverArt, selectedTracks) => set((state) => {
-        const newAlbum: Album = {
-          id: Date.now().toString(),
-          title,
-          artist: 'Custom Album',
-          coverArt,
-          year: new Date().getFullYear(),
-          tracks: selectedTracks,
-          isCustom: true
-        };
-        return { albums: [...state.albums, newAlbum] };
-      }),
-    }),
-    {
-      name: 'verse-music-store',
+  setTracks: (tracks) => set({ tracks }),
+  setAlbums: (albums) => set({ albums }),
+  setPlaylists: (playlists) => set({ playlists }),
+  playTrack: (track) => {
+    set({ currentTrack: track, isPlaying: true, currentTime: 0, duration: track.duration });
+  },
+  togglePlayPause: () => set((state) => ({ isPlaying: !state.isPlaying })),
+  nextTrack: () => {
+    const { tracks, currentTrack } = get();
+    if (currentTrack) {
+      const currentIndex = tracks.findIndex((track) => track.id === currentTrack.id);
+      const nextIndex = (currentIndex + 1) % tracks.length;
+      set({ currentTrack: tracks[nextIndex], isPlaying: true, currentTime: 0, duration: tracks[nextIndex].duration });
     }
-  )
-);
+  },
+  prevTrack: () => {
+    const { tracks, currentTrack } = get();
+    if (currentTrack) {
+      const currentIndex = tracks.findIndex((track) => track.id === currentTrack.id);
+      const prevIndex = (currentIndex - 1 + tracks.length) % tracks.length;
+      set({ currentTrack: tracks[prevIndex], isPlaying: true, currentTime: 0, duration: tracks[prevIndex].duration });
+    }
+  },
+  setCurrentTime: (time) => set({ currentTime: time }),
+  setVolume: (volume) => set({ volume }),
+  toggleMute: () => set((state) => ({ isMuted: !state.isMuted })),
+  addToWishlist: (track) => set((state) => {
+    if (state.wishlist.find((t) => t.id === track.id)) {
+      return state;
+    }
+    return { wishlist: [...state.wishlist, track] };
+  }),
+  removeFromWishlist: (trackId) => set((state) => ({
+    wishlist: state.wishlist.filter((track) => track.id !== trackId),
+  })),
+  toggleMiniPlayer: () => set((state) => ({ isMiniPlayerExpanded: !state.isMiniPlayerExpanded })),
+  toggleAlbumBuilder: () => set((state) => ({ isAlbumBuilderOpen: !state.isAlbumBuilderOpen })),
+  
+  // Account modal
+  isAccountModalOpen: false,
+  toggleAccountModal: () => set((state) => ({ isAccountModalOpen: !state.isAccountModalOpen })),
+  
+  // Search state
+  isSearchExpanded: false,
+  toggleSearch: () => set((state) => ({ isSearchExpanded: !state.isSearchExpanded })),
+}));

@@ -45,82 +45,95 @@ export const MiniPlayer: React.FC = () => {
         initial={{ y: 100 }}
         animate={{ y: 0 }}
         exit={{ y: 100 }}
-        className={`fixed bottom-0 left-0 right-0 bg-black/30 backdrop-blur-xl border-t border-white/10 z-40 ${
+        className={`fixed bottom-0 left-0 right-0 bg-black/90 backdrop-blur-xl border-t border-white/10 z-40 ${
           isMiniPlayerExpanded ? 'h-screen' : 'h-20'
         }`}
-        onClick={() => !isMiniPlayerExpanded && toggleMiniPlayer()}
       >
         {!isMiniPlayerExpanded ? (
-          // Mini Player
-          <div className="flex items-center justify-between px-6 py-4 cursor-pointer">
-            <div className="flex items-center space-x-4">
-              <img
-                src={currentTrack.coverArt}
-                alt={currentTrack.album}
-                className="w-12 h-12 rounded-lg object-cover"
-              />
-              <div>
-                <h4 className="text-white font-medium">{currentTrack.title}</h4>
-                <p className="text-gray-400 text-sm">{currentTrack.artist}</p>
+          // Mini Player - Fixed layout to prevent shifting
+          <div className="h-20 max-w-7xl mx-auto px-6 flex items-center justify-between">
+            {/* Left: Track Info */}
+            <div 
+              className="flex items-center space-x-4 min-w-0 flex-1 cursor-pointer"
+              onClick={toggleMiniPlayer}
+            >
+              <div className="relative flex-shrink-0">
+                <img
+                  src={currentTrack.coverArt}
+                  alt={currentTrack.album}
+                  className="w-12 h-12 rounded-lg object-cover"
+                />
+              </div>
+              <div className="min-w-0 flex-1">
+                <h4 className="text-white font-medium truncate">{currentTrack.title}</h4>
+                <p className="text-gray-400 text-sm truncate">{currentTrack.artist}</p>
               </div>
             </div>
 
-            <div className="flex items-center space-x-4">
-              <motion.button
-                whileHover={{ scale: 1.1 }}
-                whileTap={{ scale: 0.9 }}
-                onClick={(e) => {
-                  e.stopPropagation();
-                  handleHeartClick();
-                }}
-                className={`p-2 rounded-full transition-colors ${
-                  isInWishlist ? 'text-pink-500' : 'text-gray-400 hover:text-white'
-                }`}
+            {/* Center: Controls */}
+            <div className="flex items-center space-x-4 px-8">
+              <button 
+                onClick={prevTrack} 
+                className="text-gray-400 hover:text-white transition-colors focus-ring rounded p-1"
+                aria-label="Previous track"
               >
-                <Heart size={20} fill={isInWishlist ? 'currentColor' : 'none'} />
-              </motion.button>
-
-              <button onClick={(e) => { e.stopPropagation(); prevTrack(); }} className="text-gray-400 hover:text-white">
                 <SkipBack size={20} />
               </button>
 
               <motion.button
                 whileHover={{ scale: 1.1 }}
                 whileTap={{ scale: 0.9 }}
-                onClick={(e) => {
-                  e.stopPropagation();
-                  togglePlayPause();
-                }}
-                className="w-10 h-10 bg-white rounded-full flex items-center justify-center text-black hover:bg-gray-200 transition-colors"
+                onClick={togglePlayPause}
+                className="w-10 h-10 bg-white rounded-full flex items-center justify-center text-black hover:bg-gray-200 transition-colors focus-ring"
+                aria-label={isPlaying ? 'Pause' : 'Play'}
               >
-                {isPlaying ? <Pause size={16} /> : <Play size={16} />}
+                {isPlaying ? <Pause size={20} /> : <Play size={20} />}
               </motion.button>
 
-              <button onClick={(e) => { e.stopPropagation(); nextTrack(); }} className="text-gray-400 hover:text-white">
+              <button 
+                onClick={nextTrack} 
+                className="text-gray-400 hover:text-white transition-colors focus-ring rounded p-1"
+                aria-label="Next track"
+              >
                 <SkipForward size={20} />
               </button>
             </div>
 
-            <div className="w-1/3">
-              <div className="bg-gray-600 h-1 rounded-full overflow-hidden">
-                <div
-                  className="bg-white h-full transition-all duration-300"
-                  style={{ width: `${progress}%` }}
-                />
-              </div>
-              <div className="flex justify-between text-xs text-gray-400 mt-1">
-                <span>{formatTime(currentTime)}</span>
-                <span>{formatTime(duration)}</span>
+            {/* Right: Progress & Heart */}
+            <div className="flex items-center space-x-4 min-w-0 flex-1 justify-end">
+              <motion.button
+                whileHover={{ scale: 1.1 }}
+                whileTap={{ scale: 0.9 }}
+                onClick={handleHeartClick}
+                className={`transition-colors focus-ring rounded p-1 ${
+                  isInWishlist ? 'text-pink-500' : 'text-gray-400 hover:text-white'
+                }`}
+                aria-label={isInWishlist ? 'Remove from wishlist' : 'Add to wishlist'}
+              >
+                <Heart size={20} fill={isInWishlist ? 'currentColor' : 'none'} />
+              </motion.button>
+
+              <div className="w-32 text-right">
+                <div className="bg-gray-600 h-1 rounded-full overflow-hidden mb-1">
+                  <div
+                    className="bg-white h-full transition-all duration-300"
+                    style={{ width: `${progress}%` }}
+                  />
+                </div>
+                <div className="text-xs text-gray-400">
+                  {formatTime(currentTime)} / {formatTime(duration)}
+                </div>
               </div>
             </div>
           </div>
         ) : (
           // Expanded Player
-          <div className="h-full flex flex-col justify-center items-center p-8 bg-black/50">
+          <div className="h-full flex flex-col justify-center items-center p-8 bg-black/95">
             <motion.button
               onClick={toggleMiniPlayer}
-              className="absolute top-4 right-4 text-gray-400 hover:text-white"
+              className="absolute top-6 right-6 text-gray-400 hover:text-white focus-ring rounded-lg p-2 text-2xl"
               whileHover={{ scale: 1.1 }}
+              aria-label="Close expanded player"
             >
               ×
             </motion.button>
@@ -155,14 +168,14 @@ export const MiniPlayer: React.FC = () => {
                 whileHover={{ scale: 1.1 }}
                 whileTap={{ scale: 0.9 }}
                 onClick={handleHeartClick}
-                className={`p-3 rounded-full transition-colors ${
+                className={`p-3 rounded-full transition-colors focus-ring ${
                   isInWishlist ? 'text-pink-500' : 'text-gray-400 hover:text-white'
                 }`}
               >
                 <Heart size={24} fill={isInWishlist ? 'currentColor' : 'none'} />
               </motion.button>
 
-              <button onClick={prevTrack} className="text-gray-400 hover:text-white">
+              <button onClick={prevTrack} className="text-gray-400 hover:text-white focus-ring rounded p-2">
                 <SkipBack size={32} />
               </button>
 
@@ -170,12 +183,12 @@ export const MiniPlayer: React.FC = () => {
                 whileHover={{ scale: 1.1 }}
                 whileTap={{ scale: 0.9 }}
                 onClick={togglePlayPause}
-                className="w-16 h-16 bg-white rounded-full flex items-center justify-center text-black hover:bg-gray-200 transition-colors"
+                className="w-16 h-16 bg-white rounded-full flex items-center justify-center text-black hover:bg-gray-200 transition-colors focus-ring"
               >
                 {isPlaying ? <Pause size={24} /> : <Play size={24} />}
               </motion.button>
 
-              <button onClick={nextTrack} className="text-gray-400 hover:text-white">
+              <button onClick={nextTrack} className="text-gray-400 hover:text-white focus-ring rounded p-2">
                 <SkipForward size={32} />
               </button>
 

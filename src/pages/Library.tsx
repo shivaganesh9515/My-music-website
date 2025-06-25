@@ -10,9 +10,9 @@ export const Library: React.FC = () => {
     tracks,
     albums,
     playlists,
+    wishlist,
     playTrack,
-    addToWishlist,
-    wishlist
+    addToWishlist
   } = useMusicStore();
 
   const formatDuration = (seconds: number) => {
@@ -33,11 +33,12 @@ export const Library: React.FC = () => {
       </motion.div>
 
       <Tabs defaultValue="playlists" className="w-full">
-        <TabsList className="grid w-full grid-cols-4 bg-white/10 backdrop-blur-sm">
+        <TabsList className="grid w-full grid-cols-5 glass-card">
           <TabsTrigger value="playlists">Playlists</TabsTrigger>
           <TabsTrigger value="albums">Albums</TabsTrigger>
           <TabsTrigger value="artists">Artists</TabsTrigger>
           <TabsTrigger value="songs">Songs</TabsTrigger>
+          <TabsTrigger value="wishlist">Wishlist ♥</TabsTrigger>
         </TabsList>
 
         <TabsContent value="playlists" className="mt-6">
@@ -48,8 +49,7 @@ export const Library: React.FC = () => {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: index * 0.1 }}
-                whileHover={{ scale: 1.05 }}
-                className="bg-white/5 backdrop-blur-sm rounded-xl p-4 hover:bg-white/10 transition-all duration-300 cursor-pointer group"
+                className="glass-card glass-hover rounded-xl p-4 cursor-pointer group"
               >
                 <div className="relative mb-3">
                   <img
@@ -61,7 +61,7 @@ export const Library: React.FC = () => {
                     whileHover={{ scale: 1.1 }}
                     whileTap={{ scale: 0.9 }}
                     onClick={() => playlist.tracks[0] && playTrack(playlist.tracks[0])}
-                    className="absolute bottom-2 right-2 w-8 h-8 bg-white rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+                    className="absolute bottom-2 right-2 w-8 h-8 bg-white rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity focus-ring"
                   >
                     <Play size={12} className="text-black ml-0.5" />
                   </motion.button>
@@ -81,8 +81,7 @@ export const Library: React.FC = () => {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: index * 0.1 }}
-                whileHover={{ scale: 1.05 }}
-                className="bg-white/5 backdrop-blur-sm rounded-xl p-4 hover:bg-white/10 transition-all duration-300 cursor-pointer group"
+                className="glass-card glass-hover rounded-xl p-4 cursor-pointer group"
               >
                 <div className="relative mb-3">
                   <img
@@ -94,7 +93,7 @@ export const Library: React.FC = () => {
                     whileHover={{ scale: 1.1 }}
                     whileTap={{ scale: 0.9 }}
                     onClick={() => album.tracks[0] && playTrack(album.tracks[0])}
-                    className="absolute bottom-2 right-2 w-8 h-8 bg-white rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+                    className="absolute bottom-2 right-2 w-8 h-8 bg-white rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity focus-ring"
                   >
                     <Play size={12} className="text-black ml-0.5" />
                   </motion.button>
@@ -115,7 +114,7 @@ export const Library: React.FC = () => {
                 initial={{ opacity: 0, x: -20 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ delay: index * 0.05 }}
-                className="flex items-center space-x-4 p-4 bg-white/5 backdrop-blur-sm rounded-xl hover:bg-white/10 transition-colors cursor-pointer"
+                className="flex items-center space-x-4 p-4 glass-card glass-hover rounded-xl cursor-pointer"
               >
                 <div className="w-16 h-16 bg-gradient-to-br from-purple-500 to-pink-500 rounded-full flex items-center justify-center">
                   <span className="text-white font-bold text-xl">{artist[0]}</span>
@@ -153,7 +152,7 @@ export const Library: React.FC = () => {
                       whileHover={{ scale: 1.1 }}
                       whileTap={{ scale: 0.9 }}
                       onClick={() => playTrack(track)}
-                      className="absolute inset-0 bg-black/50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+                      className="absolute inset-0 bg-black/50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity focus-ring rounded"
                     >
                       <Play size={16} className="text-white" />
                     </motion.button>
@@ -167,14 +166,14 @@ export const Library: React.FC = () => {
                       whileHover={{ scale: 1.1 }}
                       whileTap={{ scale: 0.9 }}
                       onClick={() => addToWishlist(track)}
-                      className={`opacity-0 group-hover:opacity-100 transition-opacity ${
+                      className={`opacity-0 group-hover:opacity-100 transition-opacity focus-ring rounded p-1 ${
                         isInWishlist ? 'text-pink-500' : 'text-gray-400 hover:text-white'
                       }`}
                     >
                       <Heart size={16} fill={isInWishlist ? 'currentColor' : 'none'} />
                     </motion.button>
                     <span className="text-gray-400 text-sm">{formatDuration(track.duration)}</span>
-                    <button className="text-gray-400 hover:text-white opacity-0 group-hover:opacity-100 transition-opacity">
+                    <button className="text-gray-400 hover:text-white opacity-0 group-hover:opacity-100 transition-opacity focus-ring rounded p-1">
                       <MoreHorizontal size={16} />
                     </button>
                   </div>
@@ -182,6 +181,58 @@ export const Library: React.FC = () => {
               );
             })}
           </div>
+        </TabsContent>
+
+        <TabsContent value="wishlist" className="mt-6">
+          {wishlist.length === 0 ? (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              className="text-center py-16"
+            >
+              <Heart size={64} className="text-gray-400 mx-auto mb-4" />
+              <h2 className="text-2xl font-semibold text-white mb-2">Your wishlist is empty</h2>
+              <p className="text-gray-400">Start adding songs you love to see them here</p>
+            </motion.div>
+          ) : (
+            <div className="space-y-2">
+              {wishlist.map((track, index) => (
+                <motion.div
+                  key={track.id}
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: index * 0.05 }}
+                  className="flex items-center space-x-4 p-3 rounded-lg hover:bg-white/5 transition-colors cursor-pointer group"
+                >
+                  <div className="relative">
+                    <img
+                      src={track.coverArt}
+                      alt={track.album}
+                      className="w-12 h-12 rounded object-cover"
+                    />
+                    <motion.button
+                      whileHover={{ scale: 1.1 }}
+                      whileTap={{ scale: 0.9 }}
+                      onClick={() => playTrack(track)}
+                      className="absolute inset-0 bg-black/50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity focus-ring rounded"
+                    >
+                      <Play size={16} className="text-white" />
+                    </motion.button>
+                  </div>
+                  <div className="flex-1">
+                    <h4 className="text-white font-medium">{track.title}</h4>
+                    <p className="text-gray-400 text-sm">{track.artist}</p>
+                  </div>
+                  <div className="flex items-center space-x-4">
+                    <span className="text-gray-400 text-sm">{formatDuration(track.duration)}</span>
+                    <button className="text-gray-400 hover:text-white opacity-0 group-hover:opacity-100 transition-opacity focus-ring rounded p-1">
+                      <MoreHorizontal size={16} />
+                    </button>
+                  </div>
+                </motion.div>
+              ))}
+            </div>
+          )}
         </TabsContent>
       </Tabs>
     </div>

@@ -56,7 +56,7 @@ export const Wishlist: React.FC = () => {
                   whileHover={{ scale: 1.1 }}
                   whileTap={{ scale: 0.9 }}
                   onClick={() => playTrack(track)}
-                  className="absolute inset-0 bg-black/50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+                  className="absolute inset-0 bg-black/50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity focus-ring rounded"
                 >
                   <Play size={16} className="text-white" />
                 </motion.button>
@@ -70,12 +70,12 @@ export const Wishlist: React.FC = () => {
                   whileHover={{ scale: 1.1 }}
                   whileTap={{ scale: 0.9 }}
                   onClick={() => removeFromWishlist(track.id)}
-                  className="text-pink-500 opacity-0 group-hover:opacity-100 transition-opacity"
+                  className="text-pink-500 opacity-0 group-hover:opacity-100 transition-opacity focus-ring rounded p-1"
                 >
                   <Heart size={16} fill="currentColor" />
                 </motion.button>
                 <span className="text-gray-400 text-sm">{formatDuration(track.duration)}</span>
-                <button className="text-gray-400 hover:text-white opacity-0 group-hover:opacity-100 transition-opacity">
+                <button className="text-gray-400 hover:text-white opacity-0 group-hover:opacity-100 transition-opacity focus-ring rounded p-1">
                   <MoreHorizontal size={16} />
                 </button>
               </div>
